@@ -1,0 +1,92 @@
+-- insert product
+INTO Product (Product_id, Product_type, Product_name, Product_size, Unit_price) VALUES (110, 'sample tea', 'kiwi', 'large', 49);
+
+-------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------
+
+-- insert order
+INSERT INTO ORDERS (SALE_ID, ITEM_ID, ITEM_NAME, UNIT_PRICE, QUANTITY, "DATE", TOTAL_PRICE, ADDONS, "SIZE", PRODUCT_TYPE)
+SELECT 
+    5, -- order id
+    p.PRODUCT_ID, 
+    p.PRODUCT_NAME,
+    p.UNIT_PRICE,
+    2, -- quantity
+    SYSDATE,
+    (p.UNIT_PRICE * 2) + (9 * 2),
+    i.ITEM_NAME, -- using ITEM_NAME as ADDONS value
+    p.PRODUCT_SIZE,
+    p.PRODUCT_TYPE
+FROM PRODUCT p
+JOIN INVENTORY i ON 4 = i.ITEM_ID -- addons id
+WHERE p.PRODUCT_ID = 19; -- product id
+
+-------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------
+
+DECLARE
+    v_item_id NUMBER := 20; -- item id
+    v_quantity NUMBER := 1; -- quantity
+    v_addons_id NUMBER := 6; -- addons id from 4 to 8 if none use 8
+    v_order_id NUMBER;
+    v_total_price NUMBER;
+    v_product_size VARCHAR2(20);
+    v_product_type VARCHAR2(50);
+BEGIN
+    SELECT MAX(SALE_ID) INTO v_order_id FROM ORDERS;
+    v_order_id := v_order_id + 1;
+    SELECT PRODUCT_SIZE, PRODUCT_TYPE
+    INTO v_product_size, v_product_type
+    FROM PRODUCT
+    WHERE PRODUCT_ID = v_item_id;
+
+    INSERT INTO ORDERS (SALE_ID, ITEM_ID, ITEM_NAME, UNIT_PRICE, QUANTITY, "DATE", TOTAL_PRICE, ADDONS, "SIZE", PRODUCT_TYPE)
+    SELECT 
+        v_order_id,
+        p.PRODUCT_ID, 
+        p.PRODUCT_NAME,
+        p.UNIT_PRICE,
+        v_quantity,
+        SYSDATE,
+        CASE 
+            WHEN v_addons_id != 0 THEN p.UNIT_PRICE * v_quantity + (9 * v_quantity)
+            ELSE p.UNIT_PRICE * v_quantity
+        END,
+        i.ITEM_NAME,
+        v_product_size,
+        v_product_type 
+    FROM 
+        PRODUCT p
+    JOIN 
+        INVENTORY i ON v_addons_id = i.ITEM_ID -- join on correct columns
+    WHERE 
+        p.PRODUCT_ID = v_item_id; -- product id
+
+    COMMIT;
+    DBMS_OUTPUT.PUT_LINE('Order has been inserted successfully.');
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+        DBMS_OUTPUT.PUT_LINE('An error occurred: ' || SQLERRM);
+END;
+/
+
+desc orders;
+select * from orders;
+
+-------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------
+
+-- Insert data into SALES table from ORDERS table
+INSERT INTO SALES (QUANTITY_SOLD, TOTAL_SALES, SALE_DATE)
+SELECT 
+    SUM(QUANTITY), -- Total quantity sold
+    SUM(TOTAL_PRICE), -- Total sales amount
+    TRUNC(SYSDATE) -- Current date
+FROM ORDERS;
