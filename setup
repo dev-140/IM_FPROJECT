@@ -1,8 +1,8 @@
 -- drop all existing tables
 
-drop table inventory, product;
-drop table inventory, sales_table;
-drop table inventory, inventory;
+drop table product;
+drop table sales_table;
+drop table inventory;
 
 -- create table product 
 CREATE TABLE TBL_PRODUCT (
