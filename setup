@@ -1,11 +1,11 @@
 -- drop all existing tables
 
-drop table inventory, product;
-drop table inventory, sales_table;
-drop table inventory, inventory;
+drop table product;
+drop table sales_table;
+drop table inventory;
 
 -- create table product 
-CREATE TABLE TBL_PRODUCT (
+CREATE TABLE PRODUCT (
     Product_id NUMBER(10) PRIMARY KEY NOT NULL,
     Product_type VARCHAR2(50) NOT NULL,
     Product_name VARCHAR2(50) NOT NULL,
@@ -22,7 +22,7 @@ CREATE TABLE INVENTORY (
 
 -- create orders table
 CREATE TABLE    ORDERS (
-    SALE_ID      NUMBER(38) NOT NULL,
+    SALE_ID      NUMBER(38) PRIMARY KEY NOT NULL,
     ITEM_ID      NUMBER(10) NOT NULL,
     ITEM_NAME    VARCHAR2(50) NOT NULL,
     UNIT_PRICE   NUMBER(10,2) NOT NULL,
