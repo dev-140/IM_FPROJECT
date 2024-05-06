@@ -90,3 +90,66 @@ SELECT
     SUM(TOTAL_PRICE), -- Total sales amount
     TRUNC(SYSDATE) -- Current date
 FROM ORDERS;
+
+-------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------
+-- loop for random items in order
+DECLARE
+    v_item_id NUMBER;
+    v_quantity NUMBER;
+    v_addons_id NUMBER;
+    v_order_id NUMBER;
+    v_total_price NUMBER;
+    v_product_size VARCHAR2(20);
+    v_product_type VARCHAR2(50);
+BEGIN
+    FOR i IN 1..30 LOOP
+        -- Generate random numbers for v_item_id, v_quantity, and v_addons_id
+       v_item_id := CASE
+                WHEN DBMS_RANDOM.VALUE(0, 1) < 0.5 THEN TRUNC(DBMS_RANDOM.VALUE(1, 78))
+                ELSE TRUNC(DBMS_RANDOM.VALUE(82, 105))
+             END; -- Random item id between 1 and 78 or between 82 and 105
+        v_quantity := TRUNC(DBMS_RANDOM.VALUE(1, 5)); -- Random quantity between 1 and 5
+        v_addons_id := TRUNC(DBMS_RANDOM.VALUE(4, 8)); -- Random addons id between 4 and 8
+
+        SELECT MAX(SALE_ID) INTO v_order_id FROM ORDERS;
+        v_order_id := NVL(v_order_id, 0) + 1;
+
+        SELECT PRODUCT_SIZE, PRODUCT_TYPE
+        INTO v_product_size, v_product_type
+        FROM PRODUCT
+        WHERE PRODUCT_ID = v_item_id;
+
+        INSERT INTO ORDERS (SALE_ID, ITEM_ID, ITEM_NAME, UNIT_PRICE, QUANTITY, "DATE", TOTAL_PRICE, ADDONS, "SIZE", PRODUCT_TYPE)
+        SELECT 
+            v_order_id,
+            p.PRODUCT_ID, 
+            p.PRODUCT_NAME,
+            p.UNIT_PRICE,
+            v_quantity,
+            '7-MAY-24',
+            CASE 
+                WHEN v_addons_id != 8 THEN p.UNIT_PRICE * v_quantity + (9 * v_quantity)
+                ELSE p.UNIT_PRICE * v_quantity
+            END,
+            i.ITEM_NAME,
+            v_product_size,
+            v_product_type 
+        FROM 
+            PRODUCT p
+        JOIN 
+            INVENTORY i ON v_addons_id = i.ITEM_ID -- join on correct columns
+        WHERE 
+            p.PRODUCT_ID = v_item_id; -- product id
+
+        COMMIT;
+        DBMS_OUTPUT.PUT_LINE('Order ' || i || ' has been inserted successfully.');
+    END LOOP;
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+        DBMS_OUTPUT.PUT_LINE('An error occurred: ' || SQLERRM);
+END;
+/
