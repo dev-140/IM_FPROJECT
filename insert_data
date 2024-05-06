@@ -84,7 +84,7 @@ select * from orders;
 -------------------------------------------------------------------------------------------------------------------
 
 -- Insert data into SALES table from ORDERS table
-INSERT INTO SALES (QU`ANTITY_SOLD, TOTAL_SALES, SALE_DATE)
+INSERT INTO SALES (QUANTITY_SOLD, TOTAL_SALES, SALE_DATE)
 SELECT 
     SUM(QUANTITY), -- Total quantity sold
     SUM(TOTAL_PRICE), -- Total sales amount
