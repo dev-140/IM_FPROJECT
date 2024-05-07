@@ -1,0 +1,43 @@
+-- drop all existing tables
+
+drop table product;
+drop table sales_table;
+drop table inventory;
+
+-- create table product 
+CREATE TABLE PRODUCT (
+    Product_id NUMBER(10) PRIMARY KEY NOT NULL,
+    Product_type VARCHAR2(50) NOT NULL,
+    Product_name VARCHAR2(50) NOT NULL,
+    Product_size VARCHAR2(20) NOT NULL,
+    Unit_price NUMBER(10, 2) NOT NULL
+);
+
+-- create inventory table
+CREATE TABLE INVENTORY (
+    item_id NUMBER(10) PRIMARY KEY NOT NULL,
+    item_name VARCHAR2(100) NOT NULL,
+    quantity NUMBER(10) NOT NULL
+);
+
+-- create orders table
+CREATE TABLE    ORDERS (
+    SALE_ID      NUMBER(38) PRIMARY KEY NOT NULL,
+    ITEM_ID      NUMBER(10) NOT NULL,
+    ITEM_NAME    VARCHAR2(50) NOT NULL,
+    UNIT_PRICE   NUMBER(10,2) NOT NULL,
+    QUANTITY     NUMBER NOT NULL,
+    "DATE"         DATE NOT NULL,
+    TOTAL_PRICE  NUMBER(10,2) NOT NULL,
+    ADDONS       VARCHAR2(100),
+    "SIZE"       VARCHAR2(20),
+    PRODUCT_TYPE VARCHAR2(50)
+);
+
+-- create sales table
+CREATE TABLE SALES (
+    QUANTITY_SOLD NUMBER NOT NULL,
+    TOTAL_SALES NUMBER(10,2) NOT NULL,
+    SALE_DATE DATE NOT NULL
+);
+
